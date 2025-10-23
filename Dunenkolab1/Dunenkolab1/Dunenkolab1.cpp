@@ -3,282 +3,325 @@
 #include <string>
 #include <limits>
 
-struct Pipe {
-    std::string km_mark;
-    double length_km;
-    int diameter_mm;
-    bool under_repair;
+using namespace std;
 
-    void input() {
-        std::cout << "Enter km mark: ";
-        std::cin.ignore();
-        std::getline(std::cin, km_mark);
-
-        std::cout << "Enter length (km): ";
-        while (!(std::cin >> length_km) || length_km <= 0) {
-            std::cout << "Invalid input. Enter a positive number: ";
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        }
-
-        std::cout << "Enter diameter (mm): ";
-        while (!(std::cin >> diameter_mm) || diameter_mm <= 0) {
-            std::cout << "Invalid input. Enter a positive integer: ";
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        }
-
-        under_repair = false;
-    }
-
-    void display() const {
-        std::cout << "Pipe:\n";
-        std::cout << "  KM Mark: " << km_mark << "\n";
-        std::cout << "  Length: " << length_km << " km\n";
-        std::cout << "  Diameter: " << diameter_mm << " mm\n";
-        std::cout << "  Under repair: " << (under_repair ? "Yes" : "No") << "\n";
-    }
-
-    void toggle_repair() {
-        under_repair = !under_repair;
-        std::cout << "Repair status toggled.\n";
-    }
-
-    void save(std::ofstream& out) const {
-        out << km_mark << "\n"
-            << length_km << "\n"
-            << diameter_mm << "\n"
-            << under_repair << "\n";
-    }
-
-    bool load(std::ifstream& in) {
-        if (!std::getline(in, km_mark)) return false;
-        if (!(in >> length_km)) return false;
-        if (!(in >> diameter_mm)) return false;
-        if (!(in >> under_repair)) return false;
-        in.ignore(); // skip newline after bool
-        return true;
-    }
+// Structure representing a pipeline segment
+struct PipelineSegment {
+    string kmMark;
+    double lengthKm = 0.0;
+    double diameterMm = 0.0;
+    bool isUnderRepair = false;
 };
 
+// Structure representing a gas compressor station
 struct CompressorStation {
-    std::string name;
-    int total_workshops;
-    int active_workshops;
-    int station_class;
-
-    void input() {
-        std::cout << "Enter station name: ";
-        std::cin.ignore();
-        std::getline(std::cin, name);
-
-        std::cout << "Enter total number of workshops: ";
-        while (!(std::cin >> total_workshops) || total_workshops <= 0) {
-            std::cout << "Invalid input. Enter a positive integer: ";
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        }
-
-        active_workshops = total_workshops; // initially all active
-
-        std::cout << "Enter station class (1-5): ";
-        while (!(std::cin >> station_class) || station_class < 1 || station_class > 5) {
-            std::cout << "Invalid input. Enter an integer from 1 to 5: ";
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        }
-    }
-
-    void display() const {
-        std::cout << "Compressor Station:\n";
-        std::cout << "  Name: " << name << "\n";
-        std::cout << "  Total workshops: " << total_workshops << "\n";
-        std::cout << "  Active workshops: " << active_workshops << "\n";
-        std::cout << "  Station class: " << station_class << "\n";
-    }
-
-    void start_workshop() {
-        if (active_workshops < total_workshops) {
-            active_workshops++;
-            std::cout << "Workshop started. Active: " << active_workshops << "\n";
-        }
-        else {
-            std::cout << "All workshops are already active.\n";
-        }
-    }
-
-    void stop_workshop() {
-        if (active_workshops > 0) {
-            active_workshops--;
-            std::cout << "Workshop stopped. Active: " << active_workshops << "\n";
-        }
-        else {
-            std::cout << "No workshops to stop.\n";
-        }
-    }
-
-    void save(std::ofstream& out) const {
-        out << name << "\n"
-            << total_workshops << "\n"
-            << active_workshops << "\n"
-            << station_class << "\n";
-    }
-
-    bool load(std::ifstream& in) {
-        if (!std::getline(in, name)) return false;
-        if (!(in >> total_workshops)) return false;
-        if (!(in >> active_workshops)) return false;
-        if (!(in >> station_class)) return false;
-        in.ignore(); // skip newline after int
-        return true;
-    }
+    string name;
+    int totalWorkshops = 0;
+    int activeWorkshops = 0;
+    int classLevel = 0;
 };
 
-int get_menu_choice() {
-    int choice;
-    std::cout << "\nMenu:\n";
-    std::cout << "1. Add Pipe\n";
-    std::cout << "2. Add Compressor Station\n";
-    std::cout << "3. View all objects\n";
-    std::cout << "4. Edit Pipe (toggle repair)\n";
-    std::cout << "5. Edit Compressor Station (start/stop workshop)\n";
-    std::cout << "6. Save to file\n";
-    std::cout << "7. Load from file\n";
-    std::cout << "0. Exit\n";
-    std::cout << "Choose an option: ";
-
-    while (!(std::cin >> choice) || choice < 0 || choice > 7) {
-        std::cout << "Invalid choice. Enter 0-7: ";
-        std::cin.clear();
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+// Template function for safe input with validation
+template <typename T>
+T getValidInput(const string& sect) {
+    T value;
+    while (true) {
+        cout << sect;
+        cin >> value;
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Invalid input. \n";
+        } else {
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            return value;
+        }
     }
-    return choice;
 }
 
-void edit_compressor_station(CompressorStation& cs) {
-    if (cs.name.empty()) {
-        std::cout << "No compressor station exists.\n";
+// Display the main menu
+void showMenu() {
+    cout << "\n   PIPELINE MANAGEMENT SYSTEM\n";
+    cout << "--------------------------------\n";
+    cout << "1. Add Pipeline Segment\n";
+    cout << "2. Add Compressor Station\n";
+    cout << "3. View All Objects\n";
+    cout << "4. Toggle Pipe Repair Status\n";
+    cout << "5. Manage Station Workshops\n";
+    cout << "6. Save All Data\n";
+    cout << "7. Load Data\n";
+    cout << "8. Save Pipe Only\n";
+    cout << "9. Save Station Only\n";
+    cout << "0. Exit\n";
+    cout << "--------------------------------\n";
+}
+
+// Create a new pipeline segment
+void addPipeline(PipelineSegment& pipe) {
+    cout << "\n--- Adding New Pipeline Segment ---\n";
+    cout << "Enter kilometers ";
+    getline(cin, pipe.kmMark);
+
+    pipe.lengthKm = getValidInput<double>("Enter length (km): ");
+    while (pipe.lengthKm <= 0) {
+        cout << "Length must be positive. ";
+        pipe.lengthKm = getValidInput<double>("Enter length (km): ");
+    }
+
+    pipe.diameterMm = getValidInput<double>("Enter diameter (mm): ");
+    while (pipe.diameterMm <= 0) {
+        cout << "Diameter must be positive. ";
+        pipe.diameterMm = getValidInput<double>("Enter diameter (mm): ");
+    }
+
+    pipe.isUnderRepair = false;
+    cout << "Pipeline segment added successfully!\n";
+}
+
+// Create a new compressor station
+void addStation(CompressorStation& station) {
+    cout << "\n--- Adding New Compressor Station ---\n";
+    cout << "Enter station name: ";
+    getline(cin, station.name);
+
+    station.totalWorkshops = getValidInput<int>("Enter total number of workshops: ");
+    while (station.totalWorkshops <= 0) {
+        cout << "Total workshops must be positive. ";
+        station.totalWorkshops = getValidInput<int>("Enter total number of workshops: ");
+    }
+
+    station.activeWorkshops = getValidInput<int>("Enter number of active workshops: ");
+    while (station.activeWorkshops < 0 || station.activeWorkshops > station.totalWorkshops) {
+        cout << "Active workshops cannot exceed total workshops. ";
+        station.activeWorkshops = getValidInput<int>("Enter number of active workshops: ");
+    }
+
+    station.classLevel = getValidInput<int>("Enter station class (1-5): ");
+    while (station.classLevel < 1 || station.classLevel > 5) {
+        cout << "Class must be between 1 and 5. ";
+        station.classLevel = getValidInput<int>("Enter station class (1-5): ");
+    }
+
+    cout << "Compressor station added successfully!\n";
+}
+
+// Display all stored objects
+void displayObjects(const PipelineSegment& pipe, const CompressorStation& station) {
+    cout << "\n--- CURRENT OBJECTS ---\n";
+
+    cout << "\nPIPELINE SEGMENT:\n";
+    if (pipe.kmMark.empty()) {
+        cout << "  No data available\n";
+    } else {
+        cout << "  Kilometer mark: " << pipe.kmMark << "\n";
+        cout << "  Length: " << pipe.lengthKm << " km\n";
+        cout << "  Diameter: " << pipe.diameterMm << " mm\n";
+        cout << "  Repair status: " << (pipe.isUnderRepair ? "Under repair" : "Operational") << "\n";
+    }
+
+    cout << "\nCOMPRESSOR STATION:\n";
+    if (station.name.empty()) {
+cout << "  No data available\n";
+    } else {
+        cout << "  Name: " << station.name << "\n";
+        cout << "  Workshops: " << station.activeWorkshops << " / " << station.totalWorkshops << "\n";
+        cout << "  Class: " << station.classLevel << "\n";
+    }
+}
+
+// Toggle repair status of the pipeline
+void toggleRepairStatus(PipelineSegment& pipe) {
+    if (pipe.kmMark.empty()) {
+        cout << "Error: No pipeline segment exists. Please add one first.\n";
         return;
     }
 
-    int action;
-    std::cout << "1. Start workshop\n2. Stop workshop\nChoose: ";
-    while (!(std::cin >> action) || (action != 1 && action != 2)) {
-        std::cout << "Invalid choice. Enter 1 or 2: ";
-        std::cin.clear();
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    }
+    cout << "\nCurrent status: " << (pipe.isUnderRepair ? "Under repair" : "Operational") << "\n";
+    cout << "1. Mark as under repair\n";
+    cout << "2. Mark as operational\n";
 
-    if (action == 1) {
-        cs.start_workshop();
-    }
-    else {
-        cs.stop_workshop();
+    int choice = getValidInput<int>("Select option: ");
+    if (choice == 1) {
+        pipe.isUnderRepair = true;
+        cout << "Pipeline marked as under repair.\n";
+    } else if (choice == 2) {
+        pipe.isUnderRepair = false;
+        cout << "Pipeline marked as operational.\n";
+    } else {
+        cout << "Invalid option.\n";
     }
 }
 
-int main() {
-    Pipe pipe;
-    CompressorStation cs;
-    bool pipe_exists = false;
-    bool cs_exists = false;
+// Manage active workshops at the station
+void manageWorkshops(CompressorStation& station) {
+    if (station.name.empty()) {
+        cout << "Error: No compressor station exists. Please add one first.\n";
+        return;
+    }
 
-    while (true) {
-        int choice = get_menu_choice();
+    cout << "\nCurrent workshops: " << station.activeWorkshops << " / " << station.totalWorkshops << "\n";
+    cout << "1. Start a workshop\n";
+    cout << "2. Stop a workshop\n";
 
-        switch (choice) {
-        case 1: {
-            pipe.input();
-            pipe_exists = true;
-            break;
+    int action = getValidInput<int>("Select action: ");
+    if (action == 1) {
+        if (station.activeWorkshops < station.totalWorkshops) {
+            station.activeWorkshops++;
+            cout << "Workshop started. Now " << station.activeWorkshops << " active.\n";
+        } else {
+            cout << "All workshops are already active.\n";
         }
-        case 2: {
-            cs.input();
-            cs_exists = true;
-            break;
+    } else if (action == 2) {
+        if (station.activeWorkshops > 0) {
+            station.activeWorkshops--;
+            cout << "Workshop stopped. Now " << station.activeWorkshops << " active.\n";
+        } else {
+            cout << "No active workshops to stop.\n";
         }
-        case 3: {
-            if (pipe_exists) pipe.display();
-            else std::cout << "No pipe data.\n";
+    } else {
+        cout << "Invalid option.\n";
+    }
+}
 
-            if (cs_exists) cs.display();
-            else std::cout << "No compressor station data.\n";
-            break;
-        }
-        case 4: {
-            if (!pipe_exists) {
-                std::cout << "No pipe to edit.\n";
-            }
-            else {
-                pipe.toggle_repair();
-            }
-            break;
-        }
-        case 5: {
-            if (!cs_exists) {
-                std::cout << "No compressor station to edit.\n";
-            }
-            else {
-                edit_compressor_station(cs);
-            }
-            break;
-        }
-        case 6: {
-            std::string filename;
-            std::cout << "Enter filename to save: ";
-            std::cin.ignore();
-            std::getline(std::cin, filename);
+// Save pipeline data to an output stream
+void savePipe(const PipelineSegment& pipe, ofstream& out) {
+    out << "PIPE\n";
+    out << pipe.kmMark << "\n";
+    out << pipe.lengthKm << "\n";
+    out << pipe.diameterMm << "\n";
+    out << pipe.isUnderRepair << "\n";
+}
 
-            std::ofstream out(filename);
-            if (!out) {
-                std::cout << "Error opening file for writing.\n";
-                break;
-            }
+// Save station data to an output stream
+void saveStation(const CompressorStation& station, ofstream& out) {
+    out << "STATION\n";
+    out << station.name << "\n";
+    out << station.totalWorkshops << "\n";
+    out << station.activeWorkshops << "\n";
+    out << station.classLevel << "\n";
+}
 
-            out << pipe_exists << "\n";
-            if (pipe_exists) pipe.save(out);
+// Save all data to a single file
+void saveAll(const PipelineSegment& pipe, const CompressorStation& station) {
+    ofstream file("pipeline_data.txt");
+    if (!file.is_open()) {
+        cout << "Error: Could not open file for writing.\n";
+        return;
+    }
 
-            out << cs_exists << "\n";
-            if (cs_exists) cs.save(out);
+    if (!pipe.kmMark.empty()) {
+        savePipe(pipe, file);
+    }
+    if (!station.name.empty()) {
+        saveStation(station, file);
+    }
 
-            out.close();
-            std::cout << "Data saved successfully.\n";
-            break;
-        }
-        case 7: {
-            std::string filename;
-            std::cout << "Enter filename to load: ";
-            std::cin.ignore();
-            std::getline(std::cin, filename);
+    file.close();
+    cout << "Data saved successfully to pipeline_data.txt\n";
+}
 
-            std::ifstream in(filename);
-            if (!in) {
-                std::cout << "Error opening file for reading.\n";
-                break;
-            }
+// Load pipeline data from input stream
+void loadPipe(PipelineSegment& pipe, ifstream& in) {
+    getline(in, pipe.kmMark);
+    in >> pipe.lengthKm >> pipe.diameterMm >> pipe.isUnderRepair;
+    in.ignore();
+}
 
-            in >> pipe_exists;
-            in.ignore();
-            if (pipe_exists && !pipe.load(in)) {
-                std::cout << "Error loading pipe data.\n";
-                pipe_exists = false;
-            }
+// Load station data from input stream
+void loadStation(CompressorStation& station, ifstream& in) {
+    getline(in, station.name);
+    in >> station.totalWorkshops >> station.activeWorkshops >> station.classLevel;
+    in.ignore();
+}
 
-            in >> cs_exists;
-            in.ignore();
-            if (cs_exists && !cs.load(in)) {
-                std::cout << "Error loading compressor station data.\n";
-                cs_exists = false;
-            }
+// Load all data from file
+void loadAll(PipelineSegment& pipe, CompressorStation& station) {
+    ifstream file("pipeline_data.txt");
+    if (!file.is_open()) {
+        cout << "Error: Could not open file for reading.\n";
+        return;
+    }
 
-            in.close();
-            std::cout << "Data loaded successfully.\n";
-            break;
-        }
-        case 0: {
-            std::cout << "Exiting...\n";
-            return 0;
-        }
+    pipe.kmMark.clear();
+    station.name.clear();
+
+    string type;
+    while (getline(file, type)) {
+        if (type == "PIPE") {
+            loadPipe(pipe, file);
+        } else if (type == "STATION") {
+loadStation(station, file);
         }
     }
+
+    file.close();
+    cout << "Data loaded successfully from pipeline_data.txt\n";
+}
+
+// Handle user menu selection
+void processChoice(int choice, PipelineSegment& pipe, CompressorStation& station) {
+    switch (choice) {
+        case 1:
+            addPipeline(pipe);
+            break;
+        case 2:
+            addStation(station);
+            break;
+        case 3:
+            displayObjects(pipe, station);
+            break;
+        case 4:
+            toggleRepairStatus(pipe);
+            break;
+        case 5:
+            manageWorkshops(station);
+            break;
+        case 6:
+            saveAll(pipe, station);
+            break;
+        case 7:
+            loadAll(pipe, station);
+            break;
+        case 8: {
+            ofstream f("pipe.txt");
+            if (f.is_open()) {
+                savePipe(pipe, f);
+                f.close();
+                cout << "Pipe saved to pipe.txt\n";
+            } else {
+                cout << "Failed to save pipe.\n";
+            }
+            break;
+        }
+        case 9: {
+            ofstream f("station.txt");
+            if (f.is_open()) {
+                saveStation(station, f);
+                f.close();
+                cout << "Station saved to station.txt\n";
+            } else {
+                cout << "Failed to save station.\n";
+            }
+            break;
+        }
+        case 0:
+            cout << "Exiting program.\n";
+            exit(0);
+        default:
+            cout << "Invalid choice. Please try again.\n";
+    }
+}
+
+// Main program loop
+int main() {
+    PipelineSegment currentPipe;
+    CompressorStation currentStation;
+
+    while (true) {
+        showMenu();
+        int option = getValidInput<int>("Enter your choice: ");
+        processChoice(option, currentPipe, currentStation);
+    }
+
+    return 0;
 }
