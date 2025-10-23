@@ -50,8 +50,6 @@ void showMenu() {
     cout << "5. Manage Station Workshops\n";
     cout << "6. Save All Data\n";
     cout << "7. Load Data\n";
-    cout << "8. Save Pipe Only\n";
-    cout << "9. Save Station Only\n";
     cout << "0. Exit\n";
     cout << "--------------------------------\n";
 }
@@ -121,7 +119,7 @@ void displayObjects(const PipelineSegment& pipe, const CompressorStation& statio
 
     cout << "\nCOMPRESSOR STATION:\n";
     if (station.name.empty()) {
-cout << "  No data available\n";
+        cout << "  No data available\n";
     } else {
         cout << "  Name: " << station.name << "\n";
         cout << "  Workshops: " << station.activeWorkshops << " / " << station.totalWorkshops << "\n";
@@ -224,14 +222,14 @@ void saveAll(const PipelineSegment& pipe, const CompressorStation& station) {
 void loadPipe(PipelineSegment& pipe, ifstream& in) {
     getline(in, pipe.kmMark);
     in >> pipe.lengthKm >> pipe.diameterMm >> pipe.isUnderRepair;
-    in.ignore();
+    
 }
 
 // Load station data from input stream
 void loadStation(CompressorStation& station, ifstream& in) {
     getline(in, station.name);
     in >> station.totalWorkshops >> station.activeWorkshops >> station.classLevel;
-    in.ignore();
+    
 }
 
 // Load all data from file
@@ -250,7 +248,7 @@ void loadAll(PipelineSegment& pipe, CompressorStation& station) {
         if (type == "PIPE") {
             loadPipe(pipe, file);
         } else if (type == "STATION") {
-loadStation(station, file);
+            loadStation(station, file);
         }
     }
 
@@ -282,28 +280,6 @@ void processChoice(int choice, PipelineSegment& pipe, CompressorStation& station
         case 7:
             loadAll(pipe, station);
             break;
-        case 8: {
-            ofstream f("pipe.txt");
-            if (f.is_open()) {
-                savePipe(pipe, f);
-                f.close();
-                cout << "Pipe saved to pipe.txt\n";
-            } else {
-                cout << "Failed to save pipe.\n";
-            }
-            break;
-        }
-        case 9: {
-            ofstream f("station.txt");
-            if (f.is_open()) {
-                saveStation(station, f);
-                f.close();
-                cout << "Station saved to station.txt\n";
-            } else {
-                cout << "Failed to save station.\n";
-            }
-            break;
-        }
         case 0:
             cout << "Exiting program.\n";
             exit(0);
