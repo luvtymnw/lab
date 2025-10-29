@@ -21,7 +21,7 @@ struct CompressorStation {
     int classLevel = 0;
 };
 
-// Template function for safe input with validation template
+// Template function for safe input with validation templates
 template <typename T>
 T getValidInput(const string& sect) {
     T value;
