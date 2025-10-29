@@ -5,7 +5,7 @@
 
 using namespace std;
 
-// Structure representing a pipeline segment
+// Structure representing a pipeline segment structure
 struct PipelineSegment {
     string kmMark;
     double lengthKm = 0.0;
