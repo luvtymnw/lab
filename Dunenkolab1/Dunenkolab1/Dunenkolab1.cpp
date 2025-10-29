@@ -13,7 +13,7 @@ struct PipelineSegment {
     bool isUnderRepair = false;
 };
 
-// Structure representing a gas compressor station
+// Structure representing a gas compressor station structure
 struct CompressorStation {
     string name;
     int totalWorkshops = 0;
