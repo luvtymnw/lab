@@ -13,7 +13,7 @@ struct PipelineSegment {
     bool isUnderRepair = false;
 };
 
-// Structure representing a gas compressor station structure
+// Structure representing a gas compressor station structure 
 struct CompressorStation {
     string name;
     int totalWorkshops = 0;
@@ -21,7 +21,7 @@ struct CompressorStation {
     int classLevel = 0;
 };
 
-// Template function for safe input with validation
+// Template function for safe input with validation template
 template <typename T>
 T getValidInput(const string& sect) {
     T value;
