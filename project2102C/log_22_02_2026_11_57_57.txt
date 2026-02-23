@@ -1,0 +1,39 @@
+Sun Feb 22 11:57:57 2026 - program started
+Sun Feb 22 11:58:01 2026 - input [choose action: ] = 1
+Sun Feb 22 11:58:01 2026 - entered pipe management menu
+Sun Feb 22 11:58:17 2026 - input [choose action: ] = 1
+Sun Feb 22 11:58:42 2026 - pipe name entered: num1
+Sun Feb 22 11:58:45 2026 - input [enter pipe length (km): ] = 19191.000000
+Sun Feb 22 11:58:46 2026 - input [enter pipe diameter (mm): ] = 111.000000
+Sun Feb 22 11:58:46 2026 - pipe added with id: 1
+Sun Feb 22 11:58:52 2026 - input [choose action: ] = 1
+Sun Feb 22 11:58:56 2026 - pipe name entered: num2
+Sun Feb 22 11:58:58 2026 - input [enter pipe length (km): ] = 10001.000000
+Sun Feb 22 11:59:01 2026 - input [enter pipe diameter (mm): ] = 10.000000
+Sun Feb 22 11:59:01 2026 - pipe added with id: 2
+Sun Feb 22 11:59:04 2026 - input [choose action: ] = 0
+Sun Feb 22 11:59:04 2026 - left pipe management menu
+Sun Feb 22 11:59:08 2026 - input [choose action: ] = 2
+Sun Feb 22 11:59:08 2026 - entered station management menu
+Sun Feb 22 11:59:12 2026 - input [choose action: ] = 1
+Sun Feb 22 11:59:17 2026 - station name entered: b1
+Sun Feb 22 11:59:20 2026 - input [enter total shops: ] = 99
+Sun Feb 22 11:59:20 2026 - total shops entered: 99
+Sun Feb 22 11:59:23 2026 - input [enter operational shops (0 to 99): ] = 22
+Sun Feb 22 11:59:23 2026 - operational shops entered: 22
+Sun Feb 22 11:59:23 2026 - station added with id: 1
+Sun Feb 22 11:59:27 2026 - input [choose action: ] = 1
+Sun Feb 22 11:59:30 2026 - station name entered: b2
+Sun Feb 22 11:59:32 2026 - input [enter total shops: ] = 2020
+Sun Feb 22 11:59:32 2026 - total shops entered: 2020
+Sun Feb 22 11:59:34 2026 - input [enter operational shops (0 to 2020): ] = 222
+Sun Feb 22 11:59:34 2026 - operational shops entered: 222
+Sun Feb 22 11:59:34 2026 - station added with id: 2
+Sun Feb 22 11:59:37 2026 - input [choose action: ] = 0
+Sun Feb 22 11:59:37 2026 - left station management menu
+Sun Feb 22 11:59:40 2026 - input [choose action: ] = 4
+Sun Feb 22 11:59:40 2026 - user initiated save
+Sun Feb 22 11:59:58 2026 - user entered save filename: "testsave"
+Sun Feb 22 11:59:58 2026 - data saved to file: testsave.txt (2 stations, 2 pipes)
+Sun Feb 22 12:00:07 2026 - input [choose action: ] = 0
+Sun Feb 22 12:00:07 2026 - program exited by user
